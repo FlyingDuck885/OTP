@@ -47,3 +47,4 @@ app.post("/send-otp", (req, res) => {
 const PORT = 3000;
 app.listen(PORT, () => console.log(`OTP mailer server running on port ${PORT}`));
 
+
