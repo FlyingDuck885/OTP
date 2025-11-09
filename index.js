@@ -7,7 +7,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Use your API key from Railway environment variable
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 app.post("/send-otp", async (req, res) => {
@@ -17,17 +16,21 @@ app.post("/send-otp", async (req, res) => {
   }
 
   try {
-    const response = await axios.post("https://api.brevo.com/v3/smtp/email", {
-      sender: { name: "EcoVision", email: "no-reply@ecovision.com" },
-      to: [{ email }],
-      subject: "Your EcoVision OTP Code",
-      textContent: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
-    }, {
-      headers: {
-        "api-key": BREVO_API_KEY,
-        "Content-Type": "application/json",
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: { name: "EcoVision", email: "no-reply@ecovision.com" },
+        to: [{ email }],
+        subject: "Your EcoVision OTP Code",
+        textContent: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
       },
-    });
+      {
+        headers: {
+          "api-key": BREVO_API_KEY,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     res.status(200).json({ success: true });
   } catch (error) {
@@ -36,5 +39,5 @@ app.post("/send-otp", async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ EcoVision OTP server running on port ${PORT}`));
