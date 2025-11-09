@@ -15,10 +15,12 @@ const SENDER_APP_PASSWORD = process.env.SENDER_APP_PASSWORD;
 // =======================
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false, // use STARTTLS
   auth: {
-    user: SENDER_EMAIL,
-    pass: SENDER_APP_PASSWORD
+    user: process.env.SENDER_EMAIL,
+    pass: process.env.SENDER_APP_PASSWORD,
   },
 });
 
@@ -46,5 +48,6 @@ app.post("/send-otp", (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`OTP mailer server running on port ${PORT}`));
+
 
 
