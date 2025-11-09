@@ -10,8 +10,8 @@ app.use(bodyParser.json());
 
 // === CONFIGURE THESE ===
 // Replace with your Gmail address and the App Password you created in Google Account.
-const SENDER_EMAIL = "ecovision.app.mobile@gmail.com";
-const SENDER_APP_PASSWORD = "osao xcqy xnsk jvag";
+const SENDER_EMAIL = process.env.SENDER_EMAIL;
+const SENDER_APP_PASSWORD = process.env.SENDER_APP_PASSWORD;
 // =======================
 
 const transporter = nodemailer.createTransport({
@@ -46,3 +46,4 @@ app.post("/send-otp", (req, res) => {
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`OTP mailer server running on port ${PORT}`));
+
