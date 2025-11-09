@@ -1,6 +1,5 @@
-// index.js
 const express = require("express");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
@@ -8,46 +7,34 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// === CONFIGURE THESE ===
-// Replace with your Gmail address and the App Password you created in Google Account.
-const SENDER_EMAIL = process.env.SENDER_EMAIL;
-const SENDER_APP_PASSWORD = process.env.SENDER_APP_PASSWORD;
-// =======================
+// Use your API key from Railway environment variable
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false, // use STARTTLS
-  auth: {
-    user: process.env.SENDER_EMAIL,
-    pass: process.env.SENDER_APP_PASSWORD,
-  },
-});
-
-app.post("/send-otp", (req, res) => {
+app.post("/send-otp", async (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp) {
     return res.status(400).json({ success: false, message: "email and otp required" });
   }
 
-  const mailOptions = {
-    from: `EcoVision <${SENDER_EMAIL}>`,
-    to: email,
-    subject: "Your EcoVision OTP Code",
-    text: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
-  };
+  try {
+    const response = await axios.post("https://api.brevo.com/v3/smtp/email", {
+      sender: { name: "EcoVision", email: "no-reply@ecovision.com" },
+      to: [{ email }],
+      subject: "Your EcoVision OTP Code",
+      textContent: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
+    }, {
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+    });
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error sending email:", error);
-      return res.status(500).json({ success: false, error: error.message });
-    }
-    return res.status(200).json({ success: true, info });
-  });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error sending email:", error.response?.data || error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 const PORT = 3000;
-app.listen(PORT, () => console.log(`OTP mailer server running on port ${PORT}`));
-
-
-
+app.listen(PORT, () => console.log(`✅ EcoVision OTP server running on port ${PORT}`));
