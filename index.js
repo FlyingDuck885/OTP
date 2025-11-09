@@ -19,7 +19,7 @@ app.post("/send-otp", async (req, res) => {
     await axios.post(
       "https://api.brevo.com/v3/smtp/email",
       {
-        sender: { name: "EcoVision", email: "no-reply@ecovision.com" },
+        sender: { name: "EcoVision", email: "ecovision.app.mobile@gmail.com" },
         to: [{ email }],
         subject: "Your EcoVision OTP Code",
         textContent: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
@@ -41,3 +41,4 @@ app.post("/send-otp", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ EcoVision OTP server running on port ${PORT}`));
+
