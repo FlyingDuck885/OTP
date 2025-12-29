@@ -1,16 +1,17 @@
+require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
 app.post("/send-otp", async (req, res) => {
   const { email, otp } = req.body;
+
   if (!email || !otp) {
     return res.status(400).json({ success: false, message: "email and otp required" });
   }
@@ -22,7 +23,8 @@ app.post("/send-otp", async (req, res) => {
         sender: { name: "EcoVision", email: "ecovision.app.mobile@gmail.com" },
         to: [{ email }],
         subject: "Your EcoVision OTP Code",
-        textContent: `Your EcoVision verification code is: ${otp}\nThis code will expire in 10 minutes.`,
+        textContent: `Your EcoVision verification code is: ${otp}`,
+        htmlContent: `<h1>${otp}</h1><p>This code expires in 10 minutes.</p>`
       },
       {
         headers: {
@@ -32,13 +34,12 @@ app.post("/send-otp", async (req, res) => {
       }
     );
 
-    res.status(200).json({ success: true });
+    res.json({ success: true });
   } catch (error) {
-    console.error("Error sending email:", error.response?.data || error.message);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Brevo error:", error.response?.data || error.message);
+    res.status(500).json({ success: false });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ EcoVision OTP server running on port ${PORT}`));
-
