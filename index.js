@@ -11,6 +11,11 @@ app.use(express.urlencoded({ extended: true }));
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 console.log("BREVO_API_KEY:", BREVO_API_KEY ? "LOADED" : "MISSING");
 
+app.get("/", (req, res) => {
+  res.send("EcoVision OTP Server OK");
+});
+
+
 app.post("/send-otp", async (req, res) => {
   console.log("REQUEST BODY:", req.body);
 
@@ -59,5 +64,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ EcoVision OTP server running on port ${PORT}`);
 });
+
 
 
